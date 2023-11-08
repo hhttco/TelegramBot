@@ -18,6 +18,6 @@ Route::get('/', function () {
 // 如果需要判断权限需要登录后操作
 Route::group(['namespace' => 'Telegram', 'prefix' => 'telegram'], function() {
     // Route::post('/setTelegramWebhook', 'ConfigController@setTelegramWebhook')->name('setTelegramWebhook');
-    Route::get('/set/webhook', 'ConfigController@setWebhook')->name('setWebhook');
-    Route::get('/webhook', 'TelegramController@webhook')->name('webhook');
+    Route::post('/set/webhook', 'ConfigController@setWebhook')->name('setWebhook');
+    Route::post('/webhook', 'TelegramController@webhook')->name('webhook');
 });

@@ -20,10 +20,10 @@ class TelegramController extends Controller
         $this->telegramService = new TelegramService();
     }
 
-    public function webhook()
+    public function webhook(Request $request)
     {
-    	$this->formatMessage($request->input());
-    	return;
+        $this->formatMessage($request->input());
+        return;
     }
 
     private function formatMessage(array $data)

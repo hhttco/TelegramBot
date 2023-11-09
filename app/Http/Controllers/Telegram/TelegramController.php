@@ -44,6 +44,22 @@ class TelegramController extends Controller
         $obj->message_type = 'message';
         $obj->text = $data['message']['text'];
         $obj->is_private = $data['message']['chat']['type'] === 'private';
+
+        $obj->user_id = $data['message']['from']['id'];
+        if (isset($data['message']['from']['first_name'])) {
+            $firstName = $data['message']['from']['first_name'];
+            $obj->user_name = $firstName;
+            if (isset($data['message']['from']['last_name'])) {
+                $obj->user_name = $firstName . " " . $data['message']['from']['last_name'];
+            }
+        } else {
+            if (isset($data['message']['from']['username'])) {
+                $obj->user_name = $data['message']['from']['username'];
+            } else {
+                $obj->user_name = $data['message']['from']['id'];
+            }
+        }
+
         if (isset($data['message']['reply_to_message']['text'])) {
             $obj->message_type = 'reply_message';
             $obj->reply_text = $data['message']['reply_to_message']['text'];

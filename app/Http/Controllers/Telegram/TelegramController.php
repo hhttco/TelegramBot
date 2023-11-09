@@ -47,7 +47,7 @@ class TelegramController extends Controller
             $obj->reply_text = $data['message']['reply_to_message']['text'];
         }
 
-        Log::info($obj);
+        Log::info(json_encode($obj));
         $this->msg = $obj;
     }
 

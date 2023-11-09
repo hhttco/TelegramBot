@@ -70,6 +70,17 @@ class TelegramController extends Controller
         try {
             if ($msg->message_type === 'message') {
                 $this->telegramService->sendMessage($msg->chat_id, $msg->text);
+
+                $retText = '[$msg->user_name](tg://user?id=$msg->user_id) ' . $msg->text
+                $reply_markup = json_encode([
+                   'inline_keyboard' => [
+                        [
+                            ['text' => $retText, 'callback_data' => '/start'],
+                        ]
+                    ]
+                ]);
+
+                $this->telegramService->sendMessageMarkup($msg->chat_id, $text, $reply_markup, 'markdown');
             }
 
             if ($msg->message_type === 'reply_message') {

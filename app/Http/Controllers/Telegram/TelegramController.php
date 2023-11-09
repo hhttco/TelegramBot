@@ -30,10 +30,10 @@ class TelegramController extends Controller
 
     private function formatMessage(array $data)
     {
+        Log::info(json_encode($data));
+
         if (!isset($data['message'])) return;
         if (!isset($data['message']['text'])) return;
-
-        Log::info(json_encode($data));
 
         $obj = new \StdClass();
         $text = explode(' ', $data['message']['text']);
@@ -65,7 +65,7 @@ class TelegramController extends Controller
             $obj->reply_text = $data['message']['reply_to_message']['text'];
         }
 
-        Log::info(json_encode($obj));
+        // Log::info(json_encode($obj));
         $this->msg = $obj;
     }
 
@@ -85,18 +85,34 @@ class TelegramController extends Controller
 
         try {
             if ($msg->message_type === 'message') {
-                $this->telegramService->sendMessage($msg->chat_id, $msg->text);
+                $this->fromSend();
+                // 一定要双引号
+                // $retText = "[$msg->user_name](tg://user?id=$msg->user_id)\n" . $msg->text;
 
-                $retText = '[$msg->user_name](tg://user?id=$msg->user_id) ' . $msg->text;
-                $reply_markup = json_encode([
-                   'inline_keyboard' => [
-                        [
-                            ['text' => $retText, 'callback_data' => '/start'],
-                        ]
-                    ]
-                ]);
+                // $this->telegramService->sendMessage($msg->chat_id, $retText, 'markdown');
 
-                $this->telegramService->sendMessageMarkup($msg->chat_id, $msg->text, $reply_markup, 'markdown');
+                // $reply_markup = json_encode([
+                //    // 'inline_keyboard' => [
+                //    //      [
+                //    //          ['text' => "测试文件", 'callback_data' => '/start'],
+                //    //      ]
+                //    //  ]
+                //     'keyboard' => [
+                //         [
+                //             ['text' => "按钮1"],
+                //             ['text' => "按钮2"],
+                //             ['text' => "按钮3"],
+                //         ],
+                //         [
+                //             ['text' => "按钮4"],
+                //             ['text' => "按钮5"],
+                //         ]
+                //     ],
+                //     // 自适应按钮大小
+                //     'resize_keyboard' => true
+                // ]);
+
+                // $this->telegramService->sendMessageMarkup($msg->chat_id, $msg->text, $reply_markup, 'markdown');
             }
 
             if ($msg->message_type === 'reply_message') {
@@ -111,5 +127,46 @@ class TelegramController extends Controller
     {
         $response = $this->telegramService->getMe();
         return $response->result->username;
+    }
+
+    private function fromSend()
+    {
+        switch($this->msg->command) {
+            case '/start': $this->help();
+                break;
+            case '/getMe': $this->getMe();
+                break;
+            default: $this->help();
+        }
+    }
+
+    private function help()
+    {
+        $msg = $this->msg;
+
+        if (!$msg->is_private) return;
+        $commands = [
+            '/help - 帮助',
+            '/getMe - 获取自己的信息'
+        ];
+
+        $text = implode(PHP_EOL, $commands);
+        $this->telegramService->sendMessage($msg->chat_id, "你可以使用以下命令进行操作：\n\n$text", 'markdown');
+    }
+
+    private function getMe()
+    {
+        $msg = $this->msg;
+
+        if (!$msg->is_private) return;
+        $userInfo = [
+            '用户ID: ' . $msg->user_id,
+            '用户姓名: ' . $msg->user_name,
+        ];
+
+        // Log::info(json_encode($response));
+
+        $text = implode(PHP_EOL, $userInfo);
+        $this->telegramService->sendMessage($msg->chat_id, "当前用户信息：\n\n$text", 'markdown');
     }
 }

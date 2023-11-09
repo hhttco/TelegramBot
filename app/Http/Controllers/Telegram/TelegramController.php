@@ -66,13 +66,13 @@ class TelegramController extends Controller
         }
 
         try {
-        	if ($msg->message_type === 'message') {
-        		$this->telegramService->sendMessage($msg->chat_id, $this->getBotName() . "->" . $msg->text . 'message');
-        	}
+            if ($msg->message_type === 'message') {
+                $this->telegramService->sendMessage($msg->chat_id, $this->getBotName() . "->" . $msg->text . 'message');
+            }
 
-        	if ($msg->message_type === 'reply_message') {
-        		$this->telegramService->sendMessage($msg->chat_id, $this->getBotName() . "->" . $msg->text . ' reply_message');
-        	}
+            if ($msg->message_type === 'reply_message') {
+                $this->telegramService->sendMessage($msg->chat_id, $this->getBotName() . "->" . $msg->text . ' reply_message');
+            }
         } catch (\Exception $e) {
             $this->telegramService->sendMessage($msg->chat_id, $e->getMessage());
         }

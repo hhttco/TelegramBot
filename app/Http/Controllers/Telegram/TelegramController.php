@@ -33,6 +33,8 @@ class TelegramController extends Controller
         if (!isset($data['message'])) return;
         if (!isset($data['message']['text'])) return;
 
+        Log::info(json_encode($data));
+
         $obj = new \StdClass();
         $text = explode(' ', $data['message']['text']);
         $obj->command = $text[0];
@@ -67,11 +69,11 @@ class TelegramController extends Controller
 
         try {
             if ($msg->message_type === 'message') {
-                $this->telegramService->sendMessage($msg->chat_id, $this->getBotName() . "->" . $msg->text . 'message');
+                $this->telegramService->sendMessage($msg->chat_id, $msg->text);
             }
 
             if ($msg->message_type === 'reply_message') {
-                $this->telegramService->sendMessage($msg->chat_id, $this->getBotName() . "->" . $msg->text . ' reply_message');
+                $this->telegramService->sendMessage($msg->chat_id, $msg->text);
             }
         } catch (\Exception $e) {
             $this->telegramService->sendMessage($msg->chat_id, $e->getMessage());

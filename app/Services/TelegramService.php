@@ -32,6 +32,17 @@ class TelegramService {
         ]);
     }
 
+    public function sendMessageMarkup(int $chatId, string $text, string $reply_markup, string $parseMode = '')
+    {
+        // 可支持 markdown 语法
+        $this->request('sendMessage', [
+            'chat_id'      => $chatId,
+            'text'         => $text,
+            'reply_markup' => $reply_markup,
+            'parse_mode'   => $parseMode
+        ]);
+    }
+
     private function request(string $method, array $params = [])
     {
         $curl = new Curl();

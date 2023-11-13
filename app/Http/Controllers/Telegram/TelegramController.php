@@ -30,43 +30,78 @@ class TelegramController extends Controller
 
     private function formatMessage(array $data)
     {
-        Log::info(json_encode($data));
+        // Log::info(json_encode($data));
 
-        if (!isset($data['message'])) return;
-        if (!isset($data['message']['text'])) return;
+        // if (!isset($data['message'])) return;
+        if (!isset($data['message']['text']) && !isset($data['callback_query'])) return;
 
         $obj = new \StdClass();
-        $text = explode(' ', $data['message']['text']);
-        $obj->command = $text[0];
-        $obj->args = array_slice($text, 1);
-        $obj->chat_id = $data['message']['chat']['id'];
-        $obj->message_id = $data['message']['message_id'];
-        $obj->message_type = 'message';
-        $obj->text = $data['message']['text'];
-        $obj->is_private = $data['message']['chat']['type'] === 'private';
 
-        $obj->user_id = $data['message']['from']['id'];
-        if (isset($data['message']['from']['first_name'])) {
-            $firstName = $data['message']['from']['first_name'];
-            $obj->user_name = $firstName;
-            if (isset($data['message']['from']['last_name'])) {
-                $obj->user_name = $firstName . " " . $data['message']['from']['last_name'];
-            }
-        } else {
-            if (isset($data['message']['from']['username'])) {
-                $obj->user_name = $data['message']['from']['username'];
+        // 如果是键盘回复 可以封装一下
+        if (isset($data['callback_query'])) {
+            $obj->command =$data['callback_query']['data'];
+            $obj->callback_query_id =$data['callback_query']['id'];
+            $obj->chat_id = $data['callback_query']['message']['chat']['id'];
+            $obj->user_id = $data['callback_query']['from']['id'];
+
+            if (isset($data['callback_query']['from']['first_name'])) {
+                $firstName = $data['callback_query']['from']['first_name'];
+                $obj->user_name = $firstName;
+                if (isset($data['callback_query']['from']['last_name'])) {
+                    $obj->user_name = $firstName . " " . $data['callback_query']['from']['last_name'];
+                }
             } else {
-                $obj->user_name = $data['message']['from']['id'];
+                if (isset($data['callback_query']['from']['username'])) {
+                    $obj->user_name = $data['callback_query']['from']['username'];
+                } else {
+                    $obj->user_name = $data['callback_query']['from']['id'];
+                }
             }
-        }
 
-        if (isset($data['message']['reply_to_message']['text'])) {
-            $obj->message_type = 'reply_message';
-            $obj->reply_text = $data['message']['reply_to_message']['text'];
-        }
+            $obj->message_id = $data['callback_query']['message']['message_id'];
+            $obj->text = $data['callback_query']['message']['text'];
+            $obj->message_type = 'message';
+            $obj->is_private = $data['callback_query']['message']['chat']['type'] === 'private' ? true : false;
 
-        // Log::info(json_encode($obj));
-        $this->msg = $obj;
+            $this->msg = $obj;
+            // Log::info("这是键盘回复：" . json_encode($obj));
+        } else {
+            $text = explode(' ', $data['message']['text']);
+            $obj->command = $text[0];
+            $obj->args = array_slice($text, 1);
+            $obj->chat_id = $data['message']['chat']['id'];
+
+            if (isset($data['message']['chat']['title'])) {
+                $obj->chat_name = $data['message']['chat']['title'];
+            }
+        
+            $obj->message_id = $data['message']['message_id'];
+            $obj->message_type = 'message';
+            $obj->text = $data['message']['text'];
+            $obj->is_private = $data['message']['chat']['type'] === 'private';
+
+            $obj->user_id = $data['message']['from']['id'];
+            if (isset($data['message']['from']['first_name'])) {
+                $firstName = $data['message']['from']['first_name'];
+                $obj->user_name = $firstName;
+                if (isset($data['message']['from']['last_name'])) {
+                    $obj->user_name = $firstName . " " . $data['message']['from']['last_name'];
+                }
+            } else {
+                if (isset($data['message']['from']['username'])) {
+                    $obj->user_name = $data['message']['from']['username'];
+                } else {
+                    $obj->user_name = $data['message']['from']['id'];
+                }
+            }
+
+            if (isset($data['message']['reply_to_message']['text'])) {
+                $obj->message_type = 'reply_message';
+                $obj->reply_text = $data['message']['reply_to_message']['text'];
+            }
+
+            $this->msg = $obj;
+        }
     }
 
     public function handle()
@@ -90,29 +125,6 @@ class TelegramController extends Controller
                 // $retText = "[$msg->user_name](tg://user?id=$msg->user_id)\n" . $msg->text;
 
                 // $this->telegramService->sendMessage($msg->chat_id, $retText, 'markdown');
-
-                // $reply_markup = json_encode([
-                //    // 'inline_keyboard' => [
-                //    //      [
-                //    //          ['text' => "测试文件", 'callback_data' => '/start'],
-                //    //      ]
-                //    //  ]
-                //     'keyboard' => [
-                //         [
-                //             ['text' => "按钮1"],
-                //             ['text' => "按钮2"],
-                //             ['text' => "按钮3"],
-                //         ],
-                //         [
-                //             ['text' => "按钮4"],
-                //             ['text' => "按钮5"],
-                //         ]
-                //     ],
-                //     // 自适应按钮大小
-                //     'resize_keyboard' => true
-                // ]);
-
-                // $this->telegramService->sendMessageMarkup($msg->chat_id, $msg->text, $reply_markup, 'markdown');
             }
 
             if ($msg->message_type === 'reply_message') {
@@ -136,6 +148,12 @@ class TelegramController extends Controller
                 break;
             case '/getMe': $this->getMe();
                 break;
+            case '/getOne': $this->getMarkupInlineButton();
+                break;
+            case '/getTwo': $this->getMarkupButton();
+                break;
+            case '/delTwo': $this->delMarkupButton();
+                break;
             default: $this->help();
         }
     }
@@ -144,10 +162,13 @@ class TelegramController extends Controller
     {
         $msg = $this->msg;
 
-        if (!$msg->is_private) return;
+        // if (!$msg->is_private) return;
         $commands = [
             '/help - 帮助',
-            '/getMe - 获取自己的信息'
+            '/getMe - 获取自己的信息',
+            '/getOne - 获取按钮键盘',
+            '/getTwo - 获取键盘',
+            '/delTwo - 获取键盘'
         ];
 
         $text = implode(PHP_EOL, $commands);
@@ -158,15 +179,72 @@ class TelegramController extends Controller
     {
         $msg = $this->msg;
 
-        if (!$msg->is_private) return;
+        // if (!$msg->is_private) return;
         $userInfo = [
             '用户ID: ' . $msg->user_id,
             '用户姓名: ' . $msg->user_name,
         ];
 
-        // Log::info(json_encode($response));
+        // $userInfo = [
+        //     '群组ID: ' . $msg->chat_id,
+        //     '群组名称: ' . $msg->chat_name,
+        // ];
+
+        // Log::info(json_encode($msg));
 
         $text = implode(PHP_EOL, $userInfo);
         $this->telegramService->sendMessage($msg->chat_id, "当前用户信息：\n\n$text", 'markdown');
+    }
+
+    // 获取行内键盘
+    private function getMarkupInlineButton()
+    {
+        $msg = $this->msg;
+
+        $reply_markup = json_encode([
+            'inline_keyboard' => [
+                [
+                    ['text' => "帮助", 'callback_data' => '/help'],
+                ]
+            ]
+        ]);
+
+        $this->telegramService->sendMessageMarkup($msg->chat_id, "获取成功", $reply_markup, 'markdown');
+    }
+
+    // 获取键盘
+    private function getMarkupButton()
+    {
+        $msg = $this->msg;
+
+        $reply_markup = json_encode([
+            'keyboard' => [
+                [
+                    ['text' => "按钮1"],
+                    ['text' => "按钮2"],
+                    ['text' => "按钮3"],
+                ],
+                [
+                    ['text' => "按钮4"],
+                    ['text' => "按钮5"],
+                ]
+            ],
+            // 自适应按钮大小
+            'resize_keyboard' => true
+        ]);
+
+        $this->telegramService->sendMessageMarkup($msg->chat_id, "获取键盘成功", $reply_markup, 'markdown');
+    }
+
+    // 删除键盘
+    private function delMarkupButton()
+    {
+        $msg = $this->msg;
+
+        $reply_markup = json_encode([
+            'remove_keyboard' => true
+        ]);
+
+        $this->telegramService->sendMessageMarkup($msg->chat_id, "删除键盘成功", $reply_markup, 'markdown');
     }
 }

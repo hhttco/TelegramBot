@@ -35,6 +35,9 @@ cp .env.example .env
 php artisan key:generate
 vim .env
 
+配置BOT
+vim config/telegram.php
+
 创建BOT
 curl -X POST https://域名/telegram/set/webhook
 ```

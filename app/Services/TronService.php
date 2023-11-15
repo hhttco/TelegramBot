@@ -13,7 +13,12 @@ class TronService {
 
     public function getTrxBalance(string $addr)
     {
-        // 获取TRX余额
-        return $this->tron->getBalance($addr, true);
+        $contract = $this->tron->contract('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t');
+
+        // 获取余额
+        return [
+            'TRX余额: ' . $this->tron->getBalance($addr, true),
+            'USDT余额: ' . $contract->balanceOf($addr),
+        ];
     }
 }

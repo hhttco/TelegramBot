@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Telegram;
 
 use App\Http\Controllers\Controller;
 use App\Services\TelegramService;
+use App\Services\TronService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -11,6 +12,7 @@ class TelegramController extends Controller
 {
     protected $msg;
     protected $telegramService;
+    protected $tronService;
 
     public function __construct(Request $request)
     {
@@ -19,6 +21,7 @@ class TelegramController extends Controller
         }
 
         $this->telegramService = new TelegramService();
+        $this->tronService = new TronService();
     }
 
     public function webhook(Request $request)
@@ -154,6 +157,8 @@ class TelegramController extends Controller
                 break;
             case '/delTwo': $this->delMarkupButton();
                 break;
+            case '/trxBalance': $this->getTrxBalance();
+                break;
             default: $this->help();
         }
     }
@@ -168,7 +173,8 @@ class TelegramController extends Controller
             '/getMe - 获取自己的信息',
             '/getOne - 获取按钮键盘',
             '/getTwo - 获取键盘',
-            '/delTwo - 获取键盘'
+            '/delTwo - 删除键盘',
+            '/trxBalance - 获取TRX余额'
         ];
 
         $text = implode(PHP_EOL, $commands);
@@ -246,5 +252,20 @@ class TelegramController extends Controller
         ]);
 
         $this->telegramService->sendMessageMarkup($msg->chat_id, "删除键盘成功", $reply_markup, 'markdown');
+    }
+
+    // 获取TRX余额
+    private function getTrxBalance()
+    {
+        $msg = $this->msg;
+
+        if (!isset($msg->args[0])) {
+            abort(500, '参数有误');
+        }
+
+        // 获取
+        $balance = $this->tronService->getTrxBalance($msg->args[0]);
+
+        $this->telegramService->sendMessage($msg->chat_id, "当前余额：\n\n$balance", 'markdown');
     }
 }

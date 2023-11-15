@@ -1,4 +1,4 @@
-## 1.安装PHP环境
+# 1.安装PHP环境
 ```
 apt -y update && apt -y install curl wget git unzip nginx
 ```

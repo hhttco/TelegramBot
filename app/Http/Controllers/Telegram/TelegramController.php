@@ -174,7 +174,7 @@ class TelegramController extends Controller
             '/getOne - 获取按钮键盘',
             '/getTwo - 获取键盘',
             '/delTwo - 删除键盘',
-            '/trxBalance - 获取TRX余额'
+            '/trxBalance 地址 - 获取TRX余额'
         ];
 
         $text = implode(PHP_EOL, $commands);

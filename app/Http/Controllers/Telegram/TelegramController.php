@@ -264,8 +264,9 @@ class TelegramController extends Controller
         }
 
         // 获取
-        $balance = $this->tronService->getTrxBalance($msg->args[0]);
+        $balanceArr = $this->tronService->getTrxBalance($msg->args[0]);
 
-        $this->telegramService->sendMessage($msg->chat_id, "当前余额：\n\n$balance", 'markdown');
+        $balanceText = implode(PHP_EOL, $balanceArr);
+        $this->telegramService->sendMessage($msg->chat_id, "当前：\n\n$balanceText", 'markdown');
     }
 }

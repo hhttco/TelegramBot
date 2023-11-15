@@ -16,7 +16,7 @@ systemctl enable --now nginx php7.3-fpm
 systemctl restart php7.3-fpm
 ```
 
-## 3.安装依赖
+## 3.安装依赖工具
 ```
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/bin/composer

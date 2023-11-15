@@ -1,4 +1,4 @@
-*1.安装PHP环境
+## 1.安装PHP环境
 ```
 apt -y update && apt -y install curl wget git unzip nginx
 ```
@@ -10,19 +10,19 @@ php7.3-xml php7.3-xmlrpc php7.3-zip php7.3-intl \
 php7.3-bz2 php7.3-bcmath php-redis php7.3-fileinfo php-gmp
 ```
 
-设置启动
+## 2.设置启动
 ```
 systemctl enable --now nginx php7.3-fpm
 systemctl restart php7.3-fpm
 ```
 
-安装依赖
+## 3.安装依赖
 ```
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/bin/composer
 ```
 
-安装应用
+## 4.安装应用
 ```
 cd /var/www
 git clone https://github.com/hhttco/TelegramBot.git
@@ -34,14 +34,14 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-修改BOT配置文件
+## 5.修改BOT配置文件
 ```
 vim .env
 rm /var/www/TelegramBot/config/telegram.php
 vim /var/www/TelegramBot/config/telegram.php
 ```
 
-修改nginx配置文件
+## 6.修改nginx配置文件
 ```
 vim /etc/nginx/conf.d/tgbot.conf
 server {
@@ -64,9 +64,9 @@ server {
 }
 ```
 
-安装证书
+## 7.安装证书
 
-启动BOT
+## 8.启动BOT
 ```
 curl -X POST https://域名/telegram/set/webhook
 ```

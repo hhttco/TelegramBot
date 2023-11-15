@@ -4,7 +4,15 @@
 
 安装 php7.3 nginx 环境
 ```
-apt install -y php-gmp
+apt -y update && apt -y install curl wget git unzip nginx mariadb-server vim \
+php7.3-common php7.3-cli php7.3-fpm \
+php7.3-gd php7.3-mysql php7.3-mbstring php7.3-curl \
+php7.3-xml php7.3-xmlrpc php7.3-zip php7.3-intl \
+php7.3-bz2 php7.3-bcmath php7.3-fileinfo php-gmp
+
+systemctl enable --now nginx mariadb php7.3-fpm
+systemctl restart php7.3-fpm
+systemctl restart mariadb
 
 vim /etc/nginx/conf.d/tgbot.conf
 server {

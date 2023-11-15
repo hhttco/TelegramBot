@@ -4,7 +4,7 @@
 
 安装 php7.3 nginx 环境
 ```
-apt install  -y php-gmp
+apt install -y php-gmp
 
 vim /etc/nginx/conf.d/tgbot.conf
 server {

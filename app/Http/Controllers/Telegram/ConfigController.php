@@ -14,6 +14,10 @@ class ConfigController extends Controller
         $telegramService = new TelegramService();
         $telegramService->setWebhook($hookUrl);
 
+        if (!empty(config('telegram.bot.admin_id'))) {
+            $telegramService->sendMessage(config('telegram.bot.admin_id'), "机器人启动成功!🎉🎁😄", 'markdown');
+        }
+
         return response([
             'data' => true
         ]);

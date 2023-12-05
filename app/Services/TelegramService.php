@@ -23,7 +23,7 @@ class TelegramService {
         return $this->request('getMe');
     }
 
-    public function sendMessage(int $chatId, string $text, string $parseMode = '', int $replyToMessageId = '')
+    public function sendMessage(int $chatId, string $text, string $parseMode = '', int $replyToMessageId = NULL)
     {
         $this->request('sendMessage', [
             'chat_id'             => $chatId,

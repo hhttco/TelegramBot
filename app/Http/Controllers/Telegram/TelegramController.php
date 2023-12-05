@@ -33,7 +33,7 @@ class TelegramController extends Controller
 
     private function formatMessage(array $data)
     {
-        // Log::info(json_encode($data));
+        Log::info(json_encode($data));
 
         // if (!isset($data['message'])) return;
         if (!isset($data['message']['text']) && !isset($data['callback_query'])) return;
@@ -147,6 +147,8 @@ class TelegramController extends Controller
     private function fromSend()
     {
         switch($this->msg->command) {
+            case '/help': $this->help();
+                break;
             case '/start': $this->help();
                 break;
             case '/getMe': $this->getMe();
@@ -159,7 +161,25 @@ class TelegramController extends Controller
                 break;
             case '/trxBalance': $this->getTrxBalance();
                 break;
-            default: $this->help();
+            default: $this->defaultFunc();
+        }
+    }
+
+    private function defaultFunc()
+    {
+        $msg = $this->msg;
+
+        $adText = [
+            '广告',
+            '营销'
+        ];
+
+        foreach ($adText as $value) {
+            if (strpos($msg->text, $value) !== false) {
+                $this->telegramService->sendMessage($msg->chat_id, "请不要发广告消息", '', $msg->message_id);
+                $this->telegramService->deleteMessage($msg->chat_id, $msg->message_id);
+                break;
+            }
         }
     }
 

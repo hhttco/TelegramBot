@@ -44,6 +44,14 @@ class TelegramService {
         ]);
     }
 
+    public function deleteMessage(int $chatId, int $messageId)
+    {
+        $this->request('deleteMessage', [
+            'chat_id'    => $chatId,
+            'message_id' => $messageId
+        ]);
+    }
+
     private function request(string $method, array $params = [])
     {
         $curl = new Curl();

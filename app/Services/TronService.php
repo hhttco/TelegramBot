@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use IEXBase\TronAPI\Tron;
+use Illuminate\Support\Facades\Log;
 
 class TronService {
     protected $tron;
@@ -20,5 +21,15 @@ class TronService {
             'TRX余额: ' . $this->tron->getBalance($addr, true),
             'USDT余额: ' . $contract->balanceOf($addr),
         ];
+    }
+
+    public function transferTrx(string $addr, float $amount)
+    {
+        $res = $this->tron->send($addr, $amount);
+
+        Log::info(json_encode($res));
+
+        // 获取余额
+        return true;
     }
 }

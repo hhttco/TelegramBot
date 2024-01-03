@@ -195,7 +195,7 @@ class TelegramController extends Controller
             // '/getTwo - 获取键盘',
             // '/delTwo - 删除键盘',
             '/trxBalance 地址 - 获取TRX余额',
-            '/transferTrx 收款地址 转账数量 - TRX转账'
+            // '/transferTrx 收款地址 转账数量 - TRX转账'
         ];
 
         $text = implode(PHP_EOL, $commands);

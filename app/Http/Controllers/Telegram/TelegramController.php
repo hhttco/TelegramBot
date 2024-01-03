@@ -191,10 +191,11 @@ class TelegramController extends Controller
         $commands = [
             '/help - 帮助',
             '/getMe - 获取自己的信息',
-            '/getOne - 获取按钮键盘',
-            '/getTwo - 获取键盘',
-            '/delTwo - 删除键盘',
-            '/trxBalance 地址 - 获取TRX余额'
+            // '/getOne - 获取按钮键盘',
+            // '/getTwo - 获取键盘',
+            // '/delTwo - 删除键盘',
+            '/trxBalance 地址 - 获取TRX余额',
+            '/transferTrx 收款地址 转账数量 - TRX转账'
         ];
 
         $text = implode(PHP_EOL, $commands);
@@ -288,5 +289,23 @@ class TelegramController extends Controller
 
         $balanceText = implode(PHP_EOL, $balanceArr);
         $this->telegramService->sendMessage($msg->chat_id, "当前：\n\n$balanceText", 'markdown');
+    }
+
+    // 收款地址 转账数量 - TRX转账
+    private function transferTrx()
+    {
+        $msg = $this->msg;
+
+        if (!isset($msg->args[0])) {
+            abort(500, '参数有误');
+        }
+
+        if (!is_numeric($msg->args[1])) {
+            abort(500, '转账金额错误');
+        }
+
+        $this->tronService->transferTrx($msg->args[0], $msg->args[1]);
+
+        $this->telegramService->sendMessage($msg->chat_id, "操作成功", 'markdown');
     }
 }

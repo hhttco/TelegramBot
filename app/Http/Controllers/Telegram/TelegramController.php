@@ -211,8 +211,10 @@ class TelegramController extends Controller
         if (!$user) {
             // abort(500, '用户不存在');
             $user = new Users;
+            $user->email = $msg->user_id . '@gmail.com';
             $user->name = $msg->user_name;
             $user->telegram_id = $msg->user_id;
+            $user->password = $msg->user_id . '@gmail.com';
 
             $user->save();
         }

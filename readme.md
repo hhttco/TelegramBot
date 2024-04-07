@@ -48,15 +48,19 @@ chmod -R 755 /var/www/TelegramBot
 composer install
 cp .env.example .env
 php artisan key:generate
-
-php artisan migrate
 ```
 
 ## 7.修改BOT配置文件
+修改基础配置
+修改数据库连接
+修改BOT配置
+初始化数据库
 ```
 vim .env
 rm /var/www/TelegramBot/config/telegram.php
 vim /var/www/TelegramBot/config/telegram.php
+
+php artisan migrate
 ```
 
 ## 8.修改nginx配置文件

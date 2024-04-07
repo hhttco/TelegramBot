@@ -22,7 +22,7 @@ mysql_secure_installation
 ```
 
 ## 4.创建mysql用户
-账号：tgBot     # 自己修改为自己的 
+账号：tgBot     # 自己修改为自己的  
 密码：tgBot$3.. # 自己修改为自己的
 ```
 mysql -u root -p

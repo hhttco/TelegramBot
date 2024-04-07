@@ -7,6 +7,7 @@ use App\Services\TelegramService;
 use App\Services\TronService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\Users;
 
 class TelegramController extends Controller
 {
@@ -211,6 +212,11 @@ class TelegramController extends Controller
             '用户ID: ' . $msg->user_id,
             '用户姓名: ' . $msg->user_name,
         ];
+
+        $user = Users::where('telegram_id', $msg->user_id)->first();
+        if (!$user) {
+            abort(500, '用户不存在');
+        }
 
         // $userInfo = [
         //     '群组ID: ' . $msg->chat_id,

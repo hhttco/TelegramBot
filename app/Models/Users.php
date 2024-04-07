@@ -8,5 +8,5 @@ class Users extends Model
 {
     //
     protected $table      = 'users';
-    protected $dateFormat = 'U';
+    // protected $dateFormat = 'U';
 }

@@ -51,10 +51,10 @@ php artisan key:generate
 ```
 
 ## 7.修改BOT配置文件
-修改基础配置
-修改数据库连接
-修改BOT配置
-初始化数据库
+1) 修改基础配置  
+2) 修改数据库连接  
+3) 修改BOT配置  
+4) 初始化数据库  
 ```
 vim .env
 rm /var/www/TelegramBot/config/telegram.php

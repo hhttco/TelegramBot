@@ -207,16 +207,22 @@ class TelegramController extends Controller
     {
         $msg = $this->msg;
 
+        $user = Users::where('telegram_id', $msg->user_id)->first();
+        if (!$user) {
+            // abort(500, '用户不存在');
+            $user = new Users;
+            $user->name = $msg->user_name;
+            $user->telegram_id = $msg->user_id;
+
+            $user->save();
+        }
+
         // if (!$msg->is_private) return;
         $userInfo = [
+            '系统ID: ' . $user->id,
             '用户ID: ' . $msg->user_id,
             '用户姓名: ' . $msg->user_name,
         ];
-
-        $user = Users::where('telegram_id', $msg->user_id)->first();
-        if (!$user) {
-            abort(500, '用户不存在');
-        }
 
         // $userInfo = [
         //     '群组ID: ' . $msg->chat_id,

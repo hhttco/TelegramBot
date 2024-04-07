@@ -1,6 +1,6 @@
 ## 1.安装PHP环境
 ```
-apt -y update && apt -y install curl wget git unzip nginx
+apt -y update && apt -y install curl wget git unzip nginx mariadb-server vim
 ```
 
 ```
@@ -16,13 +16,29 @@ systemctl enable --now nginx php7.3-fpm
 systemctl restart php7.3-fpm
 ```
 
-## 3.安装依赖工具
+## 3.mysql初始化
+```
+mysql_secure_installation
+```
+
+## 4.创建mysql用户
+账号：tgBot     # 自己修改为自己的
+密码：tgBot$3.. # 自己修改为自己的
+```
+mysql -u root -p
+CREATE DATABASE tgBot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON tgBot.* TO tgBot@localhost IDENTIFIED BY 'tgBot$3..';
+FLUSH PRIVILEGES;
+quit
+```
+
+## 5.安装依赖工具
 ```
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/bin/composer
 ```
 
-## 4.安装应用
+## 6.安装应用
 ```
 cd /var/www
 git clone https://github.com/hhttco/TelegramBot.git
@@ -34,14 +50,14 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-## 5.修改BOT配置文件
+## 7.修改BOT配置文件
 ```
 vim .env
 rm /var/www/TelegramBot/config/telegram.php
 vim /var/www/TelegramBot/config/telegram.php
 ```
 
-## 6.修改nginx配置文件
+## 8.修改nginx配置文件
 ```
 vim /etc/nginx/conf.d/tgbot.conf
 server {
@@ -64,9 +80,9 @@ server {
 }
 ```
 
-## 7.安装证书
+## 9.安装证书
 
-## 8.启动BOT
+## 10.启动BOT
 ```
 curl -X POST https://域名/telegram/set/webhook
 ```

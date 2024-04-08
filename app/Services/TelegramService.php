@@ -44,6 +44,18 @@ class TelegramService {
         ]);
     }
 
+    public function editMessageMarkup(int $chatId, int $messageId, string $text, string $reply_markup, string $parseMode = '')
+    {
+        // 可支持 markdown 语法
+        $this->request('editMessageText', [
+            'chat_id'      => $chatId,
+            'message_id'   => $messageId,
+            'text'         => $text,
+            'reply_markup' => $reply_markup,
+            'parse_mode'   => $parseMode
+        ]);
+    }
+
     public function deleteMessage(int $chatId, int $messageId)
     {
         $this->request('deleteMessage', [

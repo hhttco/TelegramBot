@@ -13,8 +13,7 @@
         "iexbase/tron-api": "4.0.0",
         "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
-        "php-curl-class/php-curl-class": "^8.6",
-        "predis/predis": "^2.2"
+        "php-curl-class/php-curl-class": "^8.6"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

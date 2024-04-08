@@ -8,6 +8,7 @@ use App\Services\TronService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Users;
+use Illuminate\Support\Facades\Redis;
 
 class TelegramController extends Controller
 {
@@ -162,6 +163,10 @@ class TelegramController extends Controller
                 break;
             case '/trxBalance': $this->getTrxBalance();
                 break;
+            case '/editMessage': $this->editMessage();
+                break;
+            case '/stopEditMessage': $this->stopEditMessage();
+                break;
             default: $this->defaultFunc();
         }
     }
@@ -246,6 +251,7 @@ class TelegramController extends Controller
             'inline_keyboard' => [
                 [
                     ['text' => "帮助", 'callback_data' => '/help'],
+                    ['text' => "修改", 'callback_data' => '/editMessage'],
                 ]
             ]
         ]);
@@ -321,5 +327,61 @@ class TelegramController extends Controller
         $this->tronService->transferTrx($msg->args[0], $msg->args[1]);
 
         $this->telegramService->sendMessage($msg->chat_id, "操作成功", 'markdown');
+    }
+
+    // 修改行内键盘
+    private function editMessage()
+    {
+        $msg = $this->msg;
+
+        $reply_markup = json_encode([
+            'inline_keyboard' => [
+                [
+                    ['text' => "帮助被修改", 'callback_data' => '/help'],
+                    ['text' => "修改被修改", 'callback_data' => '/editMessage'],
+                ],
+                [
+                    ['text' => "停止修改🤚", 'callback_data' => '/stopEditMessage'],
+                ]
+            ]
+        ]);
+
+        Redis::setex('edit:Message:is:stop', 20, "1");
+
+        $reply_stop_markup = json_encode([
+            'inline_keyboard' => [
+                [
+                    ['text' => "停止修改🤚", 'callback_data' => '/stopEditMessage'],
+                ]
+            ]
+        ]);
+
+        $this->telegramService->sendMessageMarkup($msg->chat_id, "手动停止", $reply_stop_markup, 'markdown');
+
+        $titleText = $msg->text;
+        for ($i = 0; $i < 10; $i++) {
+            if (!Redis::get('edit:Message:is:stop')) {
+                $this->telegramService->sendMessage($msg->chat_id, "🤚停止成功", 'markdown');
+                break;
+            }
+
+            $titleText = $titleText . $i . "修改===被修改！！";
+            $sendText = $titleText;
+
+            if ($i < 9) {
+                $sendText = $sendText . "...";
+            }
+
+            $this->telegramService->editMessageMarkup($msg->chat_id, $msg->message_id, $sendText, $reply_markup, 'markdown');
+
+            sleep(1);
+        }
+    }
+
+    private function stopEditMessage()
+    {
+        Redis::del('edit:Message:is:stop');
+        $msg = $this->msg;
+        $this->telegramService->sendMessage($msg->chat_id, "修改停止状态", 'markdown');
     }
 }

@@ -1,6 +1,6 @@
 ## 1.安装PHP环境
 ```
-apt -y update && apt -y install curl wget git unzip nginx mariadb-server vim
+apt -y update && apt -y install curl wget git unzip nginx mariadb-server redis-server vim
 ```
 
 ```
@@ -12,7 +12,7 @@ php7.3-bz2 php7.3-bcmath php-redis php7.3-fileinfo php-gmp
 
 ## 2.设置启动
 ```
-systemctl enable --now nginx php7.3-fpm
+systemctl enable --now nginx mariadb redis-server php7.3-fpm
 systemctl restart php7.3-fpm
 ```
 

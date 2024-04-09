@@ -369,7 +369,7 @@ class TelegramController extends Controller
             $sendText = $titleText;
 
             if ($i < 9) {
-                $sendText = $sendText . "...";
+                $sendText = "发送 /stopEditMessage 停止修改🤚 \n" . $sendText . "...";
             }
 
             $this->telegramService->editMessageMarkup($msg->chat_id, $msg->message_id, $sendText, $reply_markup, 'markdown');

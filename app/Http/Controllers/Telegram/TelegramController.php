@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Telegram;
 
 use App\Http\Controllers\Controller;
 use App\Services\TelegramService;
+use App\Services\AlipayService;
 use App\Services\TronService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -166,6 +167,8 @@ class TelegramController extends Controller
             case '/editMessage': $this->editMessage();
                 break;
             case '/stopEditMessage': $this->stopEditMessage();
+                break;
+            case '/payTest': $this->payTest();
                 break;
             default: $this->defaultFunc();
         }
@@ -383,5 +386,19 @@ class TelegramController extends Controller
         Redis::del('edit:Message:is:stop');
         $msg = $this->msg;
         $this->telegramService->sendMessage($msg->chat_id, "修改停止状态", 'markdown');
+    }
+
+    private function payTest()
+    {
+        $payService = new AlipayService();
+
+        $payUrl = $payService->pay([
+            'notify_url'   => 'https://tgbot.583180.xyz/payment/notify',
+            'trade_no'     => 'Teasjhdas7711566',
+            'total_amount' => '2.0',
+        ]);
+
+        $msg = $this->msg;
+        $this->telegramService->sendMessage($msg->chat_id, $payUrl['data'], 'markdown');
     }
 }

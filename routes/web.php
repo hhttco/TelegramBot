@@ -21,3 +21,5 @@ Route::group(['namespace' => 'Telegram', 'prefix' => 'telegram'], function() {
     Route::post('/set/webhook', 'ConfigController@setWebhook')->name('setWebhook');
     Route::post('/webhook', 'TelegramController@webhook')->name('webhook');
 });
+
+Route::post('/payment/notify', 'PaymentController@notify')->name('payNotify');

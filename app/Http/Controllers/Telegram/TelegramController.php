@@ -394,8 +394,8 @@ class TelegramController extends Controller
 
         $payUrl = $payService->pay([
             'notify_url'   => 'https://tgbot.583180.xyz/payment/notify',
-            'trade_no'     => 'Teasjhdas7711566',
-            'total_amount' => '2.0',
+            'trade_no'     => 'TeasjhKUy771HYya',
+            'total_amount' => '1.0',
         ]);
 
         $msg = $this->msg;

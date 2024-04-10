@@ -2,7 +2,7 @@
 
 namespace App\Plugins\Payments;
 
-use Illuminate\Support\Facades\Http;
+use \Curl\Curl;
 
 class AlipayF2F {
     private $appId;
@@ -76,11 +76,17 @@ class AlipayF2F {
 
     public function send()
     {
-        $response = Http::get('https://openapi.alipay.com/gateway.do', $this->buildParam())->json();
+        $curl = new Curl();
+        $curl->post('https://openapi.alipay.com/gateway.do', $this->buildParam());
+        $response = json_decode($curl->response, true);
+        $curl->close();
+
+        // 返回结果带了方法名前缀
         $resKey = str_replace('.', '_', $this->method) . '_response';
         if (!isset($response[$resKey])) throw new \Exception('从支付宝请求失败');
         $response = $response[$resKey];
         if ($response['msg'] !== 'Success') throw new \Exception($response['sub_msg']);
+
         $this->response = $response;
     }
 
@@ -99,13 +105,13 @@ class AlipayF2F {
     public function buildParam(): array
     {
         $params = [
-            'app_id' => $this->appId,
-            'method' => $this->method,
-            'charset' => 'UTF-8',
-            'sign_type' => $this->signType,
-            'timestamp' => date('Y-m-d H:m:s'),
-            'biz_content' => $this->bizContent,
-            'version' => '1.0',
+            'app_id'         => $this->appId,
+            'method'         => $this->method,
+            'charset'        => 'UTF-8',
+            'sign_type'      => $this->signType,
+            'timestamp'      => date('Y-m-d H:m:s'),
+            'biz_content'    => $this->bizContent,
+            'version'        => '1.0',
             '_input_charset' => 'UTF-8'
         ];
         if ($this->notifyUrl) $params['notify_url'] = $this->notifyUrl;

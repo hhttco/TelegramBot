@@ -22,4 +22,4 @@ Route::group(['namespace' => 'Telegram', 'prefix' => 'telegram'], function() {
     Route::post('/webhook', 'TelegramController@webhook')->name('webhook');
 });
 
-Route::post('/payment/notify', 'PaymentController@notify')->name('payNotify');
+Route::post('/payment/notify', 'Guest\\PaymentController@notify')->name('payNotify');

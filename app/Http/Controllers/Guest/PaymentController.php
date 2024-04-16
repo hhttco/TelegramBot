@@ -14,14 +14,12 @@ class PaymentController extends Controller
         try {
             $paymentService = new AlipayService();
             $verify = $paymentService->notify($request->input());
-
-            Log::info("verify error" . $verify);
-
             if (!$verify) abort(500, 'verify error');
 
-            Log::info("收到回调订单：" . $verify['trade_no'] . "回调：" . $verify['callback_no']);
+            Log::info("收到回调订单：===" . $verify['trade_no'] . "<=>" . $verify['callback_no']);
+
+            die('success');
         } catch (\Exception $e) {
-            Log::info("fail");
             abort(500, 'fail');
         }
     }

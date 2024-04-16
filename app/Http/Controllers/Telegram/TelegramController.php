@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Users;
 use Illuminate\Support\Facades\Redis;
+use App\Utils\Helper;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TelegramController extends Controller
 {
@@ -390,15 +392,26 @@ class TelegramController extends Controller
 
     private function payTest()
     {
+        abort(500, '请先来配置域名');
+
         $payService = new AlipayService();
 
-        $payUrl = $payService->pay([
-            'notify_url'   => 'https://tgbot.583180.xyz/payment/notify',
-            'trade_no'     => 'TeasjhKUy771HYya',
+        $payData = $payService->pay([
+            'notify_url'   => 'https://域名/payment/notify',
+            'trade_no'     => 'APAY' . Helper::generateOrderNo(),
             'total_amount' => '1.0',
         ]);
 
+        $path = Helper::generateOrderNo() . '.png';
+        QrCode::format('png')->size(200)->margin(5)->generate($payData['data'], public_path($path));
+
+        $photo = 'https://域名/' . $path;
+
         $msg = $this->msg;
-        $this->telegramService->sendMessage($msg->chat_id, $payUrl['data'], 'markdown');
+        $this->telegramService->sendPhoto($msg->chat_id, $photo);
+
+        sleep(5);
+
+        unlink(public_path($path));
     }
 }

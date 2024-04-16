@@ -64,6 +64,14 @@ class TelegramService {
         ]);
     }
 
+    public function sendPhoto(int $chatId, string $photoUrl)
+    {
+        $this->request('sendPhoto', [
+            'chat_id'             => $chatId,
+            'photo'               => $photoUrl
+        ]);
+    }
+
     private function request(string $method, array $params = [])
     {
         $curl = new Curl();

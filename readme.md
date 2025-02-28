@@ -10,6 +10,11 @@ php7.3-xml php7.3-xmlrpc php7.3-zip php7.3-intl \
 php7.3-bz2 php7.3-bcmath php-redis php7.3-fileinfo php-gmp
 ```
 
+如果系统没有php包
+```
+apt -y install apt-transport-https lsb-release ca-certificates curl wget && wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list' && apt update
+```
+
 ## 2.设置启动
 ```
 systemctl enable --now nginx mariadb redis-server php7.3-fpm
